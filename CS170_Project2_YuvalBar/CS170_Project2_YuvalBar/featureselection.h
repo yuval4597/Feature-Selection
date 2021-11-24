@@ -10,10 +10,10 @@ struct Node
 class FeatureSelection
 {
 private:
-	std::vector<Node> data;
+	std::vector<Node> dataNodes;
 
 public:
 	void addDataNode(Node node);
 	void printData() const;
-	static void featureSearch(std::vector<Node> data);
+	void featureSearch() const;
 };
