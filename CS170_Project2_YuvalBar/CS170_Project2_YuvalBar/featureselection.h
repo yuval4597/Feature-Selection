@@ -2,6 +2,7 @@
 
 #pragma once
 #include <vector>
+#include <unordered_set>
 
 struct Node
 {
@@ -25,6 +26,7 @@ private:
 	std::vector<Node> dataNodes;
 	std::vector<std::vector<double>> totalFeatures;
 
+	double leaveOneOutCrossValidation(const std::unordered_set<int>& currentFeatures, const int featureToAdd) const;
 public:
 	void addDataNode(Node node);
 

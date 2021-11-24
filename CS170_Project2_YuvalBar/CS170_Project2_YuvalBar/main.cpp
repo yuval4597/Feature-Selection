@@ -47,9 +47,10 @@ void addDataFromFile(std::string filename, FeatureSelection& featureSelection)
 
 int main()
 {
+	srand(time(0));
+
 	FeatureSelection featureSelection;
-	addDataFromFile("CS170_Fall_2021_SMALL_data__86.txt", featureSelection);
-	
-	featureSelection.printFeature(0);
-	//featureSelection.featureSearch();
+	//addDataFromFile("CS170_Fall_2021_SMALL_data__86.txt", featureSelection);
+	addDataFromFile("testfile.txt", featureSelection);
+	featureSelection.featureSearch();
 }

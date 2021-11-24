@@ -3,7 +3,12 @@
 #include "featureselection.h"
 #include <iostream>
 #include <iomanip>
-#include <unordered_set>
+
+double FeatureSelection::leaveOneOutCrossValidation(const std::unordered_set<int>& currentFeatures, const int featureToAdd) const
+{
+	double accuracy = static_cast<double>(rand() / static_cast<double>(RAND_MAX));
+	return accuracy;
+}
 
 void FeatureSelection::addDataNode(Node node)
 {
@@ -49,16 +54,33 @@ void FeatureSelection::printFeature(const int feature /*= 0*/) const
 
 void FeatureSelection::featureSearch() const
 {
-	std::unordered_set<HashFn, Node> currentFeatures;
+	std::unordered_set<int> currentFeatures;
 
-	for (auto i = 0; i < dataNodes.size(); ++i)
+	for (auto i = 0; i < totalFeatures.size(); ++i)
 	{
 		std::cout << "On level " << i + 1 << " of the search tree\n";	// i + 1 because index 0
-		Node featureToAdd;
+		int featureToAddAtThisLevel = 0;
+		double bestSoFarAccuracy = 0.0;
 
-		for (auto j = 0; j < dataNodes.size(); ++j)
+		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
-			std::cout << "--Considering adding feature " << j + 1 << '\n';		// j + 1 because index 0		
+			if (currentFeatures.find(j) != currentFeatures.end())
+			{
+				// Already added this feature
+				continue;
+			}
+
+			double accuracy = leaveOneOutCrossValidation(currentFeatures, j);
+			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy << '\n';		// j + 1 because index 0
+			
+			if (accuracy > bestSoFarAccuracy)
+			{
+				bestSoFarAccuracy = accuracy;
+				featureToAddAtThisLevel = j;
+			}
 		}
+
+		currentFeatures.insert(featureToAddAtThisLevel);
+		std::cout << "On level " << i + 1 << " added feature " << featureToAddAtThisLevel + 1 << " to current set\n";	// 1 indexed when printing to the console
 	}
 }
