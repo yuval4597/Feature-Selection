@@ -47,7 +47,7 @@ void FeatureSelection::printFeature(const int feature /*= 0*/) const
 
 void FeatureSelection::featureSearch() const
 {
-	//std::unordered_set<Node> currentFeatures;
+	std::unordered_set<HashFn, Node> currentFeatures;
 
 	for (auto i = 0; i < dataNodes.size(); ++i)
 	{

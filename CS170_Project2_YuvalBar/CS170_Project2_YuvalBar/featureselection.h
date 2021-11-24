@@ -7,6 +7,16 @@ struct Node
 	std::vector<double> features;
 };
 
+// Hash function for the unordered_set of Nodes used in certain FeatureSelection functions
+struct HashFn
+{
+	size_t operator()(const Node& n) const
+	{
+		size_t res = std::hash<double>{}(n.features[0]);
+		return res;
+	}
+};
+
 class FeatureSelection
 {
 private:
