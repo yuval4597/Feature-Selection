@@ -4,7 +4,7 @@
 struct Node
 {
 	int classification;	// 0 or 1
-	std::vector<long double> features;
+	std::vector<double> features;
 };
 
 class FeatureSelection

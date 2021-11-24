@@ -19,7 +19,7 @@ void addDataFromFile(std::string filename, FeatureSelection& featureSelection)
 		while (getline(infile, inputline))
 		{
 			std::istringstream ss(inputline);
-			long double val;
+			double val;
 			bool isClassSet = false;	// Used to set the first number as class
 
 			Node node;
