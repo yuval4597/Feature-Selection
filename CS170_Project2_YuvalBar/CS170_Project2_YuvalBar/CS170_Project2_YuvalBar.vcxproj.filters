@@ -29,5 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__86.txt" />
+    <Text Include="testfile.txt" />
+    <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__61.txt" />
   </ItemGroup>
 </Project>
