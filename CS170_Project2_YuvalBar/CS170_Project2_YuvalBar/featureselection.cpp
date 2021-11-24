@@ -128,6 +128,7 @@ void FeatureSelection::featureSearch() const
 				if (bestSoFarAccuracy > overallBestAccuracy)
 				{
 					overallBestAccuracy = bestSoFarAccuracy;
+					bestFeatures = currentFeatures;
 					bestFeatures.insert(featureToAddAtThisLevel);
 				}
 			}
