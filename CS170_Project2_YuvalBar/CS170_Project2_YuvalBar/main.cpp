@@ -47,5 +47,7 @@ int main()
 {
 	FeatureSelection featureSelection;
 	addDataFromFile("CS170_Fall_2021_SMALL_data__86.txt", featureSelection);
-	featureSelection.featureSearch();
+	
+	featureSelection.printFeature(0);
+	//featureSelection.featureSearch();
 }
