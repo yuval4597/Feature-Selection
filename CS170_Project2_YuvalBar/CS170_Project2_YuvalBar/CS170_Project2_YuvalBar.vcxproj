@@ -148,7 +148,9 @@
   <ItemGroup>
     <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__61.txt" />
     <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__86.txt" />
+    <Text Include="..\..\..\Test_data\Ver_2_CS170_Fall_2021_Small_data__61.txt" />
     <Text Include="testfile.txt" />
+    <Text Include="Ver_2_CS170_Fall_2021_Small_data__86.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
