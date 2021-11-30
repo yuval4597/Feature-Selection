@@ -4,6 +4,12 @@
 #include <vector>
 #include <unordered_set>
 
+enum class SearchType
+{
+	ForwardSelection,
+	BackwardElimination
+};
+
 struct Node
 {
 	int classification;	// 0 or 1
@@ -16,12 +22,15 @@ private:
 	std::vector<Node> dataNodes;
 	std::vector<std::vector<double>> totalFeatures;
 
-	double leaveOneOutCrossValidation(const std::unordered_set<int>& currentFeatures, const int featureToAdd) const;
+	double leaveOneOutCrossValidation(std::unordered_set<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const;
+
+	void forwardSelection() const;
+	void backwardElimination() const;
 public:
 	void addDataNode(Node node);
 
 	void printData() const;
 	void printFeature(const int feature = 0) const;	// prints all values of this feature from the dataNodes (0 indexed)
 
-	void featureSearch() const;
+	void featureSearch(SearchType searchType) const;
 };
