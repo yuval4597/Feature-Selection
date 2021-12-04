@@ -22,10 +22,12 @@ private:
 	std::vector<Node> dataNodes;
 	std::vector<std::vector<double>> totalFeatures;
 
-	double leaveOneOutCrossValidation(std::unordered_set<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const;
+	double leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const;
 
 	void forwardSelection() const;
 	void backwardElimination() const;
+	
+	void printFeatures(const std::vector<int>& features) const;
 public:
 	void addDataNode(Node node);
 

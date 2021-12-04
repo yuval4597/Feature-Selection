@@ -4,15 +4,15 @@
 #include <iostream>
 #include <iomanip>
 
-double FeatureSelection::leaveOneOutCrossValidation(std::unordered_set<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
+double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
 {
 	if (searchType == SearchType::ForwardSelection)
 	{
-		currentFeatures.insert(featureToAddOrRemove);
+		currentFeatures[featureToAddOrRemove] = 1;
 	}
 	else // searchType == SearchType::BackwardElimination
 	{
-		currentFeatures.erase(featureToAddOrRemove);
+		currentFeatures[featureToAddOrRemove] = 0;
 	}
 
 	int numCorrectlyClassified = 0;
@@ -37,7 +37,7 @@ double FeatureSelection::leaveOneOutCrossValidation(std::unordered_set<int> curr
 			double squaredDistance = 0.0;
 			for (auto k = 0; k < dataNodes[i].features.size(); ++k)
 			{
-				if (currentFeatures.find(k) == currentFeatures.end())
+				if (currentFeatures[k] == 0)
 				{
 					continue;
 				}
@@ -65,8 +65,8 @@ double FeatureSelection::leaveOneOutCrossValidation(std::unordered_set<int> curr
 
 void FeatureSelection::forwardSelection() const
 {
-	std::unordered_set<int> currentFeatures;
-	std::unordered_set<int> bestFeatures;
+	std::vector<int> currentFeatures(totalFeatures.size(), 0);
+	std::vector<int> bestFeatures;
 
 	double overallBestAccuracy = 0.0;
 
@@ -78,7 +78,7 @@ void FeatureSelection::forwardSelection() const
 
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
-			if (currentFeatures.find(j) != currentFeatures.end())
+			if (currentFeatures[j] == 1)
 			{
 				// Already added this feature
 				continue;
@@ -96,33 +96,25 @@ void FeatureSelection::forwardSelection() const
 				{
 					overallBestAccuracy = bestSoFarAccuracy;
 					bestFeatures = currentFeatures;
-					bestFeatures.insert(featureToAddAtThisLevel);
+					bestFeatures[featureToAddAtThisLevel] = 1;
 				}
 			}
 		}
 
-		currentFeatures.insert(featureToAddAtThisLevel);
+		currentFeatures[featureToAddAtThisLevel] = 1;
 		std::cout << "On level " << i + 1 << " added feature " << featureToAddAtThisLevel + 1 << " to current set\n";	// 1 indexed when printing to the console
 	}
 
 	std::cout << "\nBest accuracy = " << overallBestAccuracy << ", with the following features:\n";
-	for (auto f : bestFeatures)
-	{
-		std::cout << f + 1 << ' ';
-	}
+	printFeatures(bestFeatures);
 	std::cout << std::endl;
 }
 
 void FeatureSelection::backwardElimination() const
 {
 	// In this case starting with all features
-	std::unordered_set<int> currentFeatures;
-	for (auto i = 0; i < totalFeatures.size(); ++i)
-	{
-		currentFeatures.insert(i);
-	}
-
-	std::unordered_set<int> bestFeatures;
+	std::vector<int> currentFeatures(totalFeatures.size(), 1);
+	std::vector<int> bestFeatures;
 
 	double overallBestAccuracy = 0.0;
 
@@ -134,7 +126,7 @@ void FeatureSelection::backwardElimination() const
 
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
-			if (currentFeatures.find(j) == currentFeatures.end())
+			if (currentFeatures[j] == 0)
 			{
 				// Already removed this feature
 				continue;
@@ -156,16 +148,25 @@ void FeatureSelection::backwardElimination() const
 			}
 		}
 
-		currentFeatures.erase(featureToRemoveAtThisLevel);
+		currentFeatures[featureToRemoveAtThisLevel] = 0;
 		std::cout << "On level " << i + 1 << " removed feature " << featureToRemoveAtThisLevel + 1 << " from current set\n";	// 1 indexed when printing to the console
 	}
 
 	std::cout << "\nBest accuracy = " << overallBestAccuracy << ", with the following features:\n";
-	for (auto f : bestFeatures)
-	{
-		std::cout << f + 1 << ' ';
-	}
+	printFeatures(bestFeatures);
 	std::cout << std::endl;
+}
+
+void FeatureSelection::printFeatures(const std::vector<int>& features) const
+{
+	for (auto i = 0; i < features.size(); ++i)
+	{
+		if (features[i] == 1)
+		{
+			std::cout << i + 1 << ' ';
+		}
+	}
+	std::cout << '\n';
 }
 
 void FeatureSelection::addDataNode(Node node)
