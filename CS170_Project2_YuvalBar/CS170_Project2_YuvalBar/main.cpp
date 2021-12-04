@@ -18,6 +18,7 @@ void addDataFromFile(std::string filename, FeatureSelection& featureSelection)
 
 	if (infile.good())
 	{
+		std::cout << "Opening file: " << filename << "... ";
 		std::string inputline;
 		while (getline(infile, inputline))
 		{
@@ -42,6 +43,8 @@ void addDataFromFile(std::string filename, FeatureSelection& featureSelection)
 
 			featureSelection.addDataNode(node);
 		}
+
+		std::cout << "Done.\n";
 	}
 	infile.close();
 }
