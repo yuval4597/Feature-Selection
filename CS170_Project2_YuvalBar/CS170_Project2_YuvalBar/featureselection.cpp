@@ -151,6 +151,7 @@ void FeatureSelection::backwardElimination() const
 				{
 					overallBestAccuracy = bestSoFarAccuracy;
 					bestFeatures = currentFeatures;
+					bestFeatures[featureToRemoveAtThisLevel] = 0;
 				}
 			}
 		}

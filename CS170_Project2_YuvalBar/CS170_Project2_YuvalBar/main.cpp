@@ -49,7 +49,7 @@ void addDataFromFile(std::string filename, FeatureSelection& featureSelection)
 int main()
 {
 	FeatureSelection featureSelection;
-	addDataFromFile("Ver_2_CS170_Fall_2021_LARGE_data__22.txt", featureSelection);
+	addDataFromFile("Ver_2_CS170_Fall_2021_Small_data__86.txt", featureSelection);
 	//addDataFromFile("testfile.txt", featureSelection);
 	double t0 = omp_get_wtime();
 	featureSelection.featureSearch(SearchType::BackwardElimination);
