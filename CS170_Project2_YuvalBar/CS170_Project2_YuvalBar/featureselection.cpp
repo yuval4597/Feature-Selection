@@ -42,7 +42,7 @@ double FeatureSelection::leaveOneOutCrossValidation(std::unordered_set<int> curr
 					continue;
 				}
 
-				double differenceBetweenFeatures = dataNodes[i].features[k] - dataNodes[j].features[k];
+				double differenceBetweenFeatures = objectToClassify.features[k] - dataNodes[j].features[k];
 				squaredDistance += differenceBetweenFeatures * differenceBetweenFeatures;
 			}
 
