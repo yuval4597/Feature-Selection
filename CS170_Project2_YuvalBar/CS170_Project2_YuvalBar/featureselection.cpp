@@ -3,6 +3,7 @@
 #include "featureselection.h"
 #include <iostream>
 #include <iomanip>
+#include <omp.h>
 
 double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
 {
@@ -76,6 +77,7 @@ void FeatureSelection::forwardSelection() const
 		int featureToAddAtThisLevel = 0;
 		double bestSoFarAccuracy = 0.0;
 
+		#pragma omp parallel for
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
 			if (currentFeatures[j] == 1)
@@ -85,18 +87,21 @@ void FeatureSelection::forwardSelection() const
 			}
 
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::ForwardSelection);
-			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy << '\n';		// j + 1 because index 0
+			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
 
 			if (accuracy > bestSoFarAccuracy)
 			{
 				bestSoFarAccuracy = accuracy;
 				featureToAddAtThisLevel = j;
 
-				if (bestSoFarAccuracy > overallBestAccuracy)
+				#pragma omp critical
 				{
-					overallBestAccuracy = bestSoFarAccuracy;
-					bestFeatures = currentFeatures;
-					bestFeatures[featureToAddAtThisLevel] = 1;
+					if (bestSoFarAccuracy > overallBestAccuracy)
+					{
+						overallBestAccuracy = bestSoFarAccuracy;
+						bestFeatures = currentFeatures;
+						bestFeatures[featureToAddAtThisLevel] = 1;
+					}
 				}
 			}
 		}
@@ -123,7 +128,8 @@ void FeatureSelection::backwardElimination() const
 		std::cout << "On level " << i + 1 << " of the search tree\n";	// i + 1 because index 0
 		int featureToRemoveAtThisLevel = 0;
 		double bestSoFarAccuracy = 0.0;
-
+		
+		#pragma omp parallel for
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
 			if (currentFeatures[j] == 0)
@@ -133,8 +139,9 @@ void FeatureSelection::backwardElimination() const
 			}
 
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::BackwardElimination);
-			std::cout << "--Considering removing feature " << j + 1 << ", accuracy = " << accuracy << '\n';		// j + 1 because index 0
+			std::cout << "--Considering removing feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
 
+			#pragma omp critical
 			if (accuracy > bestSoFarAccuracy)
 			{
 				bestSoFarAccuracy = accuracy;
@@ -215,10 +222,12 @@ void FeatureSelection::featureSearch(SearchType searchType) const
 {
 	if (searchType == SearchType::ForwardSelection)
 	{
+		std::cout << "Forward selection...\n";
 		forwardSelection();
 	}
 	else // searchType == SearchType::BackwardElimination
 	{
+		std::cout << "Backward elimination...\n";
 		backwardElimination();
 	}
 }
