@@ -5,6 +5,9 @@
 #include <iomanip>
 #include <omp.h>
 
+// Set to 1 for parallel computation, set to 0 for sequential computation
+#define PARALLELIZE 1
+
 double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
 {
 	if (searchType == SearchType::ForwardSelection)
@@ -77,7 +80,9 @@ void FeatureSelection::forwardSelection() const
 		int featureToAddAtThisLevel = 0;
 		double bestSoFarAccuracy = 0.0;
 
+#if PARALLELIZE
 		#pragma omp parallel for
+#endif
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
 			if (currentFeatures[j] == 1)
@@ -94,7 +99,9 @@ void FeatureSelection::forwardSelection() const
 				bestSoFarAccuracy = accuracy;
 				featureToAddAtThisLevel = j;
 
+#if PARALLELIZE
 				#pragma omp critical
+#endif
 				{
 					if (bestSoFarAccuracy > overallBestAccuracy)
 					{
@@ -129,7 +136,9 @@ void FeatureSelection::backwardElimination() const
 		int featureToRemoveAtThisLevel = 0;
 		double bestSoFarAccuracy = 0.0;
 		
+#if PARALLELIZE
 		#pragma omp parallel for
+#endif
 		for (auto j = 0; j < totalFeatures.size(); ++j)
 		{
 			if (currentFeatures[j] == 0)
@@ -141,7 +150,9 @@ void FeatureSelection::backwardElimination() const
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::BackwardElimination);
 			std::cout << "--Considering removing feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
 
+#if PARALLELIZE
 			#pragma omp critical
+#endif
 			if (accuracy > bestSoFarAccuracy)
 			{
 				bestSoFarAccuracy = accuracy;
