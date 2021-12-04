@@ -93,22 +93,20 @@ void FeatureSelection::forwardSelection() const
 
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::ForwardSelection);
 			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
-
+			
+#if PARALLELIZE
+			#pragma omp critical
+#endif
 			if (accuracy > bestSoFarAccuracy)
 			{
 				bestSoFarAccuracy = accuracy;
 				featureToAddAtThisLevel = j;
 
-#if PARALLELIZE
-				#pragma omp critical
-#endif
+				if (bestSoFarAccuracy > overallBestAccuracy)
 				{
-					if (bestSoFarAccuracy > overallBestAccuracy)
-					{
-						overallBestAccuracy = bestSoFarAccuracy;
-						bestFeatures = currentFeatures;
-						bestFeatures[featureToAddAtThisLevel] = 1;
-					}
+					overallBestAccuracy = bestSoFarAccuracy;
+					bestFeatures = currentFeatures;
+					bestFeatures[featureToAddAtThisLevel] = 1;
 				}
 			}
 		}
