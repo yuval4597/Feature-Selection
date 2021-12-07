@@ -1,12 +1,11 @@
 // Yuval Bar 2021
 
 #include "featureselection.h"
+#include "stats.h"
+
 #include <iostream>
 #include <iomanip>
 #include <omp.h>
-
-// Set to 1 for parallel computation, set to 0 for sequential computation
-#define PARALLELIZE 1
 
 double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
 {
@@ -186,6 +185,34 @@ void FeatureSelection::printFeatures(const std::vector<int>& features) const
 	std::cout << '\n';
 }
 
+void FeatureSelection::normalizeData()
+{
+	std::cout << "Normalizing dataset... ";
+	// Get mean and std dev for each feature
+	std::vector<double> meanValues(totalFeatures.size(), 0);
+	std::vector<double> stdDevValues(totalFeatures.size(), 0);
+
+	for (auto i = 0; i < totalFeatures.size(); ++i)
+	{
+		Stats s(totalFeatures[i]);
+		meanValues[i] = s.getMean();
+		stdDevValues[i] = s.getStandardDeviation();
+	}
+
+	// Modify data nodes
+	for (auto i = 0; i < dataNodes.size(); ++i)
+	{
+		for (auto j = 0; j < dataNodes[i].features.size(); ++j)
+		{
+			const double newValue = (dataNodes[i].features[j] - meanValues[j]) / stdDevValues[j];
+			dataNodes[i].features[j] = newValue;
+			totalFeatures[j][i] = newValue;
+		}
+	}
+
+	std::cout << "Done.\n";
+}
+
 void FeatureSelection::addDataNode(Node node)
 {
 	dataNodes.push_back(node);
@@ -228,8 +255,13 @@ void FeatureSelection::printFeature(const int feature /*= 0*/) const
 	}
 }
 
-void FeatureSelection::featureSearch(SearchType searchType) const
+void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedData /*= false*/)
 {
+	if (useNormalizedData)
+	{
+		normalizeData();
+	}
+
 	if (searchType == SearchType::ForwardSelection)
 	{
 		std::cout << "Forward selection...\n";
