@@ -144,14 +144,19 @@
   <ItemGroup>
     <ClCompile Include="featureselection.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="stats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="featureselection.h" />
+    <ClInclude Include="stats.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\..\..\Extra Credit\WineData.txt" />
     <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__61.txt" />
     <Text Include="..\..\..\Test_data\CS170_Fall_2021_SMALL_data__86.txt" />
     <Text Include="..\..\..\Test_data\Ver_2_CS170_Fall_2021_Small_data__61.txt" />
+    <Text Include="BreastCancerWisconsinDiagnostic.txt" />
+    <Text Include="GlassCANNOTUSE.txt" />
     <Text Include="testfile.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__22.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__27.txt" />

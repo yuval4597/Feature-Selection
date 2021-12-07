@@ -21,9 +21,15 @@
     <ClCompile Include="featureselection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="featureselection.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stats.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -36,5 +42,8 @@
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__22.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__27.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__72.txt" />
+    <Text Include="..\..\..\Extra Credit\WineData.txt" />
+    <Text Include="BreastCancerWisconsinDiagnostic.txt" />
+    <Text Include="GlassCANNOTUSE.txt" />
   </ItemGroup>
 </Project>
