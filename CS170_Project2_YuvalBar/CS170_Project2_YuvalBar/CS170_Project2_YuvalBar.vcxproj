@@ -161,6 +161,7 @@
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__22.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__27.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_LARGE_data__72.txt" />
+    <Text Include="Ver_2_CS170_Fall_2021_Small_data__75.txt" />
     <Text Include="Ver_2_CS170_Fall_2021_Small_data__86.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

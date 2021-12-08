@@ -5,17 +5,21 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 #include <omp.h>
 
 double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeatures, const int featureToAddOrRemove, SearchType searchType) const
 {
-	if (searchType == SearchType::ForwardSelection)
+	if (featureToAddOrRemove > -1)
 	{
-		currentFeatures[featureToAddOrRemove] = 1;
-	}
-	else // searchType == SearchType::BackwardElimination
-	{
-		currentFeatures[featureToAddOrRemove] = 0;
+		if (searchType == SearchType::ForwardSelection)
+		{
+			currentFeatures[featureToAddOrRemove] = 1;
+		}
+		else // searchType == SearchType::BackwardElimination
+		{
+			currentFeatures[featureToAddOrRemove] = 0;
+		}
 	}
 
 	int numCorrectlyClassified = 0;
@@ -40,7 +44,7 @@ double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeat
 			double squaredDistance = 0.0;
 			for (auto k = 0; k < dataNodes[i].features.size(); ++k)
 			{
-				if (currentFeatures[k] == 0)
+				if (currentFeatures.empty() || currentFeatures[k] == 0)
 				{
 					continue;
 				}
@@ -66,12 +70,21 @@ double FeatureSelection::leaveOneOutCrossValidation(std::vector<int> currentFeat
 	return accuracy;
 }
 
-void FeatureSelection::forwardSelection() const
+void FeatureSelection::forwardSelection()
 {
 	std::vector<int> currentFeatures(totalFeatures.size(), 0);
 	std::vector<int> bestFeatures;
 
 	double overallBestAccuracy = 0.0;
+
+	// Calculate default rate
+	const double defaultRate = leaveOneOutCrossValidation({}, -1, SearchType::ForwardSelection);
+	
+	std::cout << "Default rate (empty set accuracy) = " << defaultRate << '\n';
+	if (outfile.is_open())
+	{
+		outfile << "{} " << defaultRate << '\n';
+	}
 
 	for (auto i = 0; i < totalFeatures.size(); ++i)
 	{
@@ -112,6 +125,12 @@ void FeatureSelection::forwardSelection() const
 
 		currentFeatures[featureToAddAtThisLevel] = 1;
 		std::cout << "On level " << i + 1 << " added feature " << featureToAddAtThisLevel + 1 << " to current set\n";	// 1 indexed when printing to the console
+
+		if (outfile.is_open())
+		{
+			const std::string currentFeatureSet = getFeaturesAsString(currentFeatures);
+			outfile << currentFeatureSet << ' ' << bestSoFarAccuracy << '\n';
+		}
 	}
 
 	std::cout << "\nBest accuracy = " << overallBestAccuracy << ", with the following features:\n";
@@ -119,13 +138,22 @@ void FeatureSelection::forwardSelection() const
 	std::cout << std::endl;
 }
 
-void FeatureSelection::backwardElimination() const
+void FeatureSelection::backwardElimination()
 {
 	// In this case starting with all features
 	std::vector<int> currentFeatures(totalFeatures.size(), 1);
 	std::vector<int> bestFeatures;
 
 	double overallBestAccuracy = 0.0;
+
+	// Calculate accuracy for all features
+	const double accuracyAllFeatures = leaveOneOutCrossValidation(currentFeatures, -1, SearchType::BackwardElimination);
+
+	std::cout << "Accuracy with all features included = " << accuracyAllFeatures << '\n';
+	if (outfile.is_open())
+	{
+		outfile << getFeaturesAsString(currentFeatures) << ' ' << accuracyAllFeatures << '\n';
+	}
 
 	for (int i = totalFeatures.size() - 1; i >= 0; --i)
 	{
@@ -166,6 +194,12 @@ void FeatureSelection::backwardElimination() const
 
 		currentFeatures[featureToRemoveAtThisLevel] = 0;
 		std::cout << "On level " << i + 1 << " removed feature " << featureToRemoveAtThisLevel + 1 << " from current set\n";	// 1 indexed when printing to the console
+
+		if (outfile.is_open())
+		{
+			const std::string currentFeatureSet = getFeaturesAsString(currentFeatures);
+			outfile << currentFeatureSet << ' ' << bestSoFarAccuracy << '\n';
+		}
 	}
 
 	std::cout << "\nBest accuracy = " << overallBestAccuracy << ", with the following features:\n";
@@ -183,6 +217,29 @@ void FeatureSelection::printFeatures(const std::vector<int>& features) const
 		}
 	}
 	std::cout << '\n';
+}
+
+std::string FeatureSelection::getFeaturesAsString(const std::vector<int>& features) const
+{
+	std::string outputStr("{");
+	bool startedWriting = false;
+
+	for (auto i = 0; i < features.size(); ++i)
+	{
+		if (features[i] == 1)
+		{
+			if (startedWriting)
+			{
+				outputStr.append(", ");
+			}
+
+			outputStr.append(std::to_string(i + 1));	// Adding 1 because 0 indexed
+			startedWriting = true;
+		}
+	}
+	outputStr.append("}");
+
+	return outputStr;
 }
 
 void FeatureSelection::normalizeData()
@@ -230,6 +287,50 @@ void FeatureSelection::addDataNode(Node node)
 	}
 }
 
+void FeatureSelection::initDataFromFile(std::string filename)
+{
+	std::ifstream infile(filename);
+	if (!infile.is_open())
+	{
+		std::cout << "Could not open file " << filename << "!\n";
+	}
+
+	if (infile.good())
+	{
+		std::cout << "Opening file: " << filename << "... ";
+
+		infileName = filename;
+
+		std::string inputline;
+		while (getline(infile, inputline))
+		{
+			std::istringstream ss(inputline);
+			double val;
+			bool isClassSet = false;	// Used to set the first number as class
+
+			Node node;
+
+			while (ss >> val)
+			{
+				if (!isClassSet)
+				{
+					node.classification = static_cast<int>(val);
+					isClassSet = true;
+				}
+				else
+				{
+					node.features.push_back(val);
+				}
+			}
+
+			addDataNode(node);
+		}
+
+		std::cout << "Done.\n";
+	}
+	infile.close();
+}
+
 void FeatureSelection::printData() const
 {
 	std::cout << std::scientific << std::setprecision(7);	// Was given numbers with precision of 7
@@ -255,11 +356,32 @@ void FeatureSelection::printFeature(const int feature /*= 0*/) const
 	}
 }
 
-void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedData /*= false*/)
+void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedData /*= false*/, bool createOutputFile /*= false*/)
 {
 	if (useNormalizedData)
 	{
 		normalizeData();
+	}
+
+	if (createOutputFile)
+	{
+		std::string outputFileName = infileName;
+		
+		// Output txt files go in separate folder
+		outputFileName.insert(0, "Output/");
+
+		// Insert text to indicate this is an output file
+		size_t posOfExtension = outputFileName.find(".txt");
+		if (posOfExtension != std::string::npos)
+		{
+			outputFileName.insert(posOfExtension, "_outputData");
+		}
+
+		outfile.open(outputFileName);
+		if (!outfile.is_open())
+		{
+			std::cout << "Error! Could not open output file " << outputFileName << ". Please make sure there is an Output/ directory included in the root folder.\n";
+		}
 	}
 
 	if (searchType == SearchType::ForwardSelection)
@@ -271,5 +393,23 @@ void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedDa
 	{
 		std::cout << "Backward elimination...\n";
 		backwardElimination();
+	}
+}
+
+FeatureSelection::FeatureSelection(std::string filename)
+{
+	initDataFromFile(filename);
+}
+
+FeatureSelection::FeatureSelection()
+{
+
+}
+
+FeatureSelection::~FeatureSelection()
+{
+	if (outfile.is_open())
+	{
+		outfile.close();
 	}
 }

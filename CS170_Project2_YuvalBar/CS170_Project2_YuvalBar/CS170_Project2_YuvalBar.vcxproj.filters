@@ -45,5 +45,6 @@
     <Text Include="..\..\..\Extra Credit\WineData.txt" />
     <Text Include="BreastCancerWisconsinDiagnostic.txt" />
     <Text Include="GlassCANNOTUSE.txt" />
+    <Text Include="Ver_2_CS170_Fall_2021_Small_data__75.txt" />
   </ItemGroup>
 </Project>
