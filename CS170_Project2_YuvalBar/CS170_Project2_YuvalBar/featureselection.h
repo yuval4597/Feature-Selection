@@ -5,7 +5,7 @@
 #include <fstream>
 
 // Set to 1 for parallel computation, set to 0 for sequential computation
-#define PARALLELIZE 1
+#define PARALLELIZE 0
 
 enum class SearchType
 {

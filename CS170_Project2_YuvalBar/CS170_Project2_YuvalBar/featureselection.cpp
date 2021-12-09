@@ -83,7 +83,7 @@ void FeatureSelection::forwardSelection()
 	std::cout << "Default rate (empty set accuracy) = " << defaultRate << "\n\n";
 	if (outfile.is_open())
 	{
-		outfile << "{} " << defaultRate << '\n';
+		outfile << "{}; " << defaultRate << '\n';
 	}
 
 	for (auto i = 0; i < totalFeatures.size(); ++i)
@@ -129,7 +129,7 @@ void FeatureSelection::forwardSelection()
 		if (outfile.is_open())
 		{
 			const std::string currentFeatureSet = getFeaturesAsString(currentFeatures);
-			outfile << currentFeatureSet << ' ' << bestSoFarAccuracy << '\n';
+			outfile << currentFeatureSet << "; " << bestSoFarAccuracy << '\n';
 		}
 	}
 
@@ -152,7 +152,7 @@ void FeatureSelection::backwardElimination()
 	std::cout << "Accuracy with all features included = " << accuracyAllFeatures << "\n\n";
 	if (outfile.is_open())
 	{
-		outfile << getFeaturesAsString(currentFeatures) << ' ' << accuracyAllFeatures << '\n';
+		outfile << getFeaturesAsString(currentFeatures) << "; " << accuracyAllFeatures << '\n';
 	}
 
 	for (int i = totalFeatures.size() - 1; i >= 0; --i)
@@ -198,7 +198,7 @@ void FeatureSelection::backwardElimination()
 		if (outfile.is_open())
 		{
 			const std::string currentFeatureSet = getFeaturesAsString(currentFeatures);
-			outfile << currentFeatureSet << ' ' << bestSoFarAccuracy << '\n';
+			outfile << currentFeatureSet << "; " << bestSoFarAccuracy << '\n';
 		}
 	}
 
