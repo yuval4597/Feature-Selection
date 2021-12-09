@@ -104,8 +104,16 @@ void FeatureSelection::forwardSelection()
 			}
 
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::ForwardSelection);
-			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
-			
+			std::cout << "--Considering adding feature " << j + 1 << ", accuracy = " << accuracy;	// j + 1 because index 0
+			if (PARALLELIZE)
+			{
+				std::cout << " (Thread: " << omp_get_thread_num() << ")\n";
+			}
+			else
+			{
+				std::cout << '\n';
+			}
+
 #if PARALLELIZE
 			#pragma omp critical
 #endif
@@ -173,7 +181,15 @@ void FeatureSelection::backwardElimination()
 			}
 
 			double accuracy = leaveOneOutCrossValidation(currentFeatures, j, SearchType::BackwardElimination);
-			std::cout << "--Considering removing feature " << j + 1 << ", accuracy = " << accuracy << " (Thread: " << omp_get_thread_num() << ")\n";		// j + 1 because index 0
+			std::cout << "--Considering removing feature " << j + 1 << ", accuracy = " << accuracy;	// j + 1 because index 0
+			if (PARALLELIZE)
+			{
+				std::cout << " (Thread: " << omp_get_thread_num() << ")\n";		
+			}
+			else
+			{
+				std::cout << '\n';
+			}
 
 #if PARALLELIZE
 			#pragma omp critical
