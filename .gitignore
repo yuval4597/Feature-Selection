@@ -334,4 +334,4 @@ ASALocalRun/
 .localhistory/
 
 # Output files for this project are irrelevant
-Output/
+Output/*
