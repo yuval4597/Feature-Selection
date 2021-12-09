@@ -7,14 +7,37 @@
 
 int main()
 {
-	FeatureSelection featureSelection("Ver_2_CS170_Fall_2021_Small_data__75.txt");
+	std::cout << "What file would you like to load the dataset from (include extension)? ";
 
-	const bool normalizeData = true;
+	std::string inputFilename;
+	std::cin >> inputFilename;
+
+	FeatureSelection featureSelection(inputFilename);
+
+	bool normalizeData = true;
+
+	std::cout << "Would you like to normalize the data (1 - normalize/ 0 - do NOT normalize)? ";
+	std::cin >> normalizeData;
+
+	int searchInput = 0;
+
+	std::cout << "Forward selection (0) or backward elimination (1)? ";
+	std::cin >> searchInput;
+
+	SearchType searchType;
+	switch (searchInput)
+	{
+	case 0:
+		searchType = SearchType::ForwardSelection;
+		break;
+	case 1:
+		searchType = SearchType::BackwardElimination;
+		break;
+	default:
+		searchType = SearchType::ForwardSelection;;
+	}
+
 	const bool createOutputFile = true;
 
-	double t0 = omp_get_wtime();
-	featureSelection.featureSearch(SearchType::ForwardSelection, normalizeData, createOutputFile);
-	double t1 = omp_get_wtime();
-
-	std::cout << "Took " << t1 - t0 << " seconds\n";
+	featureSelection.featureSearch(searchType, normalizeData, createOutputFile);
 }

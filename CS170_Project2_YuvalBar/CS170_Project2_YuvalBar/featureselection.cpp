@@ -80,7 +80,7 @@ void FeatureSelection::forwardSelection()
 	// Calculate default rate
 	const double defaultRate = leaveOneOutCrossValidation({}, -1, SearchType::ForwardSelection);
 	
-	std::cout << "Default rate (empty set accuracy) = " << defaultRate << '\n';
+	std::cout << "Default rate (empty set accuracy) = " << defaultRate << "\n\n";
 	if (outfile.is_open())
 	{
 		outfile << "{} " << defaultRate << '\n';
@@ -124,7 +124,7 @@ void FeatureSelection::forwardSelection()
 		}
 
 		currentFeatures[featureToAddAtThisLevel] = 1;
-		std::cout << "On level " << i + 1 << " added feature " << featureToAddAtThisLevel + 1 << " to current set\n";	// 1 indexed when printing to the console
+		std::cout << "On level " << i + 1 << " added feature " << featureToAddAtThisLevel + 1 << " to current set\n\n";	// 1 indexed when printing to the console
 
 		if (outfile.is_open())
 		{
@@ -149,7 +149,7 @@ void FeatureSelection::backwardElimination()
 	// Calculate accuracy for all features
 	const double accuracyAllFeatures = leaveOneOutCrossValidation(currentFeatures, -1, SearchType::BackwardElimination);
 
-	std::cout << "Accuracy with all features included = " << accuracyAllFeatures << '\n';
+	std::cout << "Accuracy with all features included = " << accuracyAllFeatures << "\n\n";
 	if (outfile.is_open())
 	{
 		outfile << getFeaturesAsString(currentFeatures) << ' ' << accuracyAllFeatures << '\n';
@@ -193,7 +193,7 @@ void FeatureSelection::backwardElimination()
 		}
 
 		currentFeatures[featureToRemoveAtThisLevel] = 0;
-		std::cout << "On level " << i + 1 << " removed feature " << featureToRemoveAtThisLevel + 1 << " from current set\n";	// 1 indexed when printing to the console
+		std::cout << "On level " << i + 1 << " removed feature " << featureToRemoveAtThisLevel + 1 << " from current set\n\n";	// 1 indexed when printing to the console
 
 		if (outfile.is_open())
 		{
@@ -267,7 +267,7 @@ void FeatureSelection::normalizeData()
 		}
 	}
 
-	std::cout << "Done.\n";
+	std::cout << "Done.\n\n";
 }
 
 void FeatureSelection::addDataNode(Node node)
@@ -292,7 +292,7 @@ void FeatureSelection::initDataFromFile(std::string filename)
 	std::ifstream infile(filename);
 	if (!infile.is_open())
 	{
-		std::cout << "Could not open file " << filename << "!\n";
+		std::cout << "Error! Could not open file \"" << filename << "\"!\n";
 	}
 
 	if (infile.good())
@@ -326,7 +326,10 @@ void FeatureSelection::initDataFromFile(std::string filename)
 			addDataNode(node);
 		}
 
-		std::cout << "Done.\n";
+		isDataValid = true;
+		std::cout << "Done.\n\n";
+
+		printDatasetInfo();
 	}
 	infile.close();
 }
@@ -356,8 +359,28 @@ void FeatureSelection::printFeature(const int feature /*= 0*/) const
 	}
 }
 
+void FeatureSelection::printDatasetInfo()
+{
+	if (!isDataValid)
+	{
+		std::cout << "Data is not valid! Cannot print info.\n";
+	}
+
+	const int numOfInstances = dataNodes.size();
+	const int numOfFeatures = totalFeatures.size();
+	std::cout << "This dataset has:\n";
+	std::cout << numOfFeatures << " features (excluding classification)\n";
+	std::cout << numOfInstances << " instances\n\n";
+}
+
 void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedData /*= false*/, bool createOutputFile /*= false*/)
 {
+	if (!isDataValid)
+	{
+		std::cout << "Data is invalid! Cannot proceed with search.\n";
+		return;
+	}
+
 	if (useNormalizedData)
 	{
 		normalizeData();
@@ -384,6 +407,7 @@ void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedDa
 		}
 	}
 
+	double t0 = omp_get_wtime();
 	if (searchType == SearchType::ForwardSelection)
 	{
 		std::cout << "Forward selection...\n";
@@ -394,6 +418,9 @@ void FeatureSelection::featureSearch(SearchType searchType, bool useNormalizedDa
 		std::cout << "Backward elimination...\n";
 		backwardElimination();
 	}
+	double t1 = omp_get_wtime();
+	double elapsedTime = t1 - t0;
+	std::cout << "Search took " << elapsedTime << " seconds.\n";
 }
 
 FeatureSelection::FeatureSelection(std::string filename)

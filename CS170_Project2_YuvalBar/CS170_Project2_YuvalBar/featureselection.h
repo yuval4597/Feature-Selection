@@ -22,6 +22,8 @@ struct Node
 class FeatureSelection
 {
 private:
+	bool isDataValid = false;	// If data was successfully initialized from a file, this will be true
+
 	std::vector<Node> dataNodes;
 	std::vector<std::vector<double>> totalFeatures;
 
@@ -45,6 +47,8 @@ public:
 
 	void printData() const;
 	void printFeature(const int feature = 0) const;	// Prints all values of this feature from the dataNodes (0 indexed)
+
+	void printDatasetInfo();	// Prints info about the dataset like number of instances and number of features
 
 	// Search type is either ForwardSelection or BackwardElimination
 	// If useNormalizedData is true, then will normalize data before starting search
